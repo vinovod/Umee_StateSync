@@ -1,26 +1,26 @@
 ### This document briefly describes how to start the node from StateSync Provider
 
-1. Check wheither provider address is availabe: 213.246.39.63:26657
+1. Check wheither provider address is availabe: 178.170.49.138:26657
 2. Set variables with data for StateSync
 ```bash
-RPC="213.246.39.63:26657"
+RPC="178.170.49.138:26657"
 RECENT_HEIGHT=$(curl -s $RPC/block | jq -r .result.block.header.height)
 TRUST_HEIGHT=$((RECENT_HEIGHT - 500))
 TRUST_HASH=$(curl -s "$RPC/block?height=$TRUST_HEIGHT" | jq -r .result.block_id.hash)
-PEER="d40580805488ee7b0489241360dfd0b0fa7b328e@213.246.39.53:26656,f96136ef2ca1f0a4d720ade2c6d07497faaef721@213.246.39.63:26656"
+PEER="1eb144f6389b0d174b4227f9642ffcd8cee00cc2@178.170.49.138:26656,b5a58e36171fb3bb0dc60c80010d889b7be17ce1@65.108.141.96:26656"
 ```
 3. Check wheither variables are set correctly
 ```bash
 echo $RPC, $RECENT_HEIGHT, $TRUST_HEIGHT, $TRUST_HASH, $PEER
 ```
-4. Make config.toml changes
+4. Make config.toml and app.toml changes
 ```bash
 sed -i.bak -E "s|^(enable[[:space:]]+=[[:space:]]+).*$|\1true| ; \
 s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$RPC,$RPC\"| ; \
 s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$TRUST_HEIGHT| ; \
 s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"|" $HOME/.umee/config/config.toml
-
 sed -i.bak -e "s/^persistent_peers *=.*/persistent_peers = \"$PEER\"/" $HOME/.umee/config/config.toml
+sed -i.bak -e "s/^snapshot-interval *=.*/snapshot-interval = 500/" $HOME/.umee/config/app.toml
 ```
 5. Stop the node and reset local blockchain. Node config will not be affected.
 ```bash
